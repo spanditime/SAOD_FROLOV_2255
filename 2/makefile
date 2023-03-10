@@ -1,4 +1,4 @@
-all: a1 a2 a3
+all: a1 a2 a3 a5 a6 a8
 
 
 a1:
@@ -9,3 +9,13 @@ a2:
 
 a3:
 	g++ 3/main.cpp -o 3.out
+
+a5:
+	g++ 5/main.cpp -o 5.out
+
+a6:
+	g++ 6/main.cpp -o 6.out
+
+a8:
+	g++ 8/main.cpp -o 8.out
+
