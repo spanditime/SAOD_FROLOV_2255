@@ -79,7 +79,22 @@ public:
 
 class Archive{
 public:
-	static char* decompress(uint8_t* data, std::size_t size) {
+	static char* decompress(const char* filename){
+		std::ifstream infile(filename);
+		
+		uint8_t *buffer;
+		//get length of file
+		infile.seekg(0, std::ifstream::end);
+		size_t length = infile.tellg();
+		infile.seekg(0, std::ios::beg);
+		
+		buffer = new uint8_t[length];
+
+		//read file
+		infile.read((char*)buffer, length);
+		return decompressRaw(buffer,length);
+	}
+	static char* decompressRaw(uint8_t* data, std::size_t size) {
 		uint64_t letters = ((uint64_t*)data)[0];
 		std::cout<< "letter = "<<letters<<std::endl;
 
@@ -127,5 +142,19 @@ public:
 
 		std::cout<< message << std::endl;
 		return message;
+	}
+	
+	void compress(const char*message,const char*filename){
+		std::map<char, uint> weighted;
+		std::size_t stlen = std::strlen(message);
+		for(uint i = 0; i < stlen; i++){
+			if(weighted.count(message[i])){
+				weighted[message[i]] += 1;
+			}else{
+				weighted[message[i]] = 1;
+			}
+		}
+
+
 	}
 };
