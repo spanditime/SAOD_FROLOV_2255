@@ -1,6 +1,8 @@
 #include <cstdint>
 #include <iostream>
 #include <map>
+#include <cstring>
+#include <fstream>
 
 class BitReader{
 private:
@@ -13,20 +15,18 @@ public:
 		data = Data;
 		size = Size;
 	}
-	uint8_t getBit(){
-		uint8_t ret = (data[bytesoffset] >> (7-bitsoffset)) & 0x01;
+	uint64_t getBit(){
+		uint64_t ret = (data[bytesoffset] >> (bitsoffset)) & 0x01;
 		bitsoffset += 1;
 		bytesoffset += bitsoffset / 8;
 		bitsoffset %= 8;
 		return ret;
 	}
-	uint8_t getBits(uint8_t len){
-		uint8_t ret = 0x00;
+	uint64_t getBits(uint8_t len){
+		uint64_t ret = 0x00;
 		for(uint8_t i= 0; i < len; i++){
-			ret |= getBit();
-			ret <<=1;
+			ret |= (getBit() << i);
 		}
-		ret >>= 1;
 		return ret;
 	}
 	void moveBytes(uint64_t bytes){
@@ -40,6 +40,42 @@ public:
 	}
 };
 
+class BitWriter{
+private:
+	std::ofstream fst;
+	uint8_t byte=0;
+	uint8_t fill=0;
+	void writeByte(){
+		fst.write((char*)&byte, 1);
+		fill = 0;
+		byte = 0;
+	}
+public:
+	BitWriter(const char*filename){
+		fst = std::ofstream(filename, std::ios::binary);
+	}
+	void writeBit(uint8_t bit){
+		byte >>=1;
+		fill += 1;
+		byte |= (bit & 1) << 7;
+		if(fill == 8){
+			writeByte();
+		}
+	}
+	void writeBits(uint64_t bits, uint8_t len){
+		for(uint8_t i = 0; i < len; i++){
+			writeBit(bits);
+			bits >>=1;
+		}
+	}
+	void close(){
+		if(fill){
+			byte >>= 8-fill;
+			writeByte();
+		}
+		fst.close();
+	}
+};
 
 class Archive{
 public:
@@ -75,8 +111,7 @@ public:
 		for(uint64_t l = 0; l < letters; l++){
 			uint8_t kword=0,m=0;
 			do{
-				kword <<=1;
-				kword |= reader.getBit();
+				kword |= reader.getBit() << m;
 				m+=1;
 				if(alphabet.count(std::make_pair(kword, m))){
 					break;
