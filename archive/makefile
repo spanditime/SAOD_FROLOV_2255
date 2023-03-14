@@ -1,2 +1,2 @@
 all:
-	g++ -g main.cpp -o arch.out
+	g++ -g main.cpp arch.cpp -o arch.out
