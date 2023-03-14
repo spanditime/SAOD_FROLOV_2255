@@ -1,9 +1,10 @@
 # Archive
 Uses Huffman's encoding to compress text into a .compressed file
-
+## Usage
+```./arch.out -h``` for help
 ## Bit structure of the file
 #### Header
-64 bits - number of ascii characters in encoded message\
+32 bits - number of ascii characters in encoded message\
 8 bits = __*mkwsize*__ - max size of encoded keyword in bits\
 8 bits = __*L*__ size of an alphabet\
 #### Alphabet
