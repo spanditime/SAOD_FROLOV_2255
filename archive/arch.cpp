@@ -40,14 +40,8 @@ public:
 	uint64_t getByteOffset(){
 		return bytesoffset;
 	}
-	void moveBytes(uint64_t bytes){
-		bytesoffset += bytes;
-	}
-	void moveBits(uint8_t bits){
-		bytesoffset += bits / 8;
-		bitsoffset += bits % 8;
-		bytesoffset += bitsoffset / 8;
-		bitsoffset %= 8;
+	void close(){
+		delete[] data;
 	}
 };
 
@@ -264,14 +258,14 @@ char* decompressRaw(uint8_t* data, std::size_t size){
 			}
 		if(m>kwmsize){
 				message[l] = '\0';
+				reader.close();
 				throw Archive::exception("Error while reading compressed file", "Invalid format", 8);
-				return message;
 			}
 		}while(true);
 		message[l] = alphabet[std::make_pair(kword, m)];
 	}
 	message[letters] = '\0';
-
+	reader.close();
 	return message;
 }
 
@@ -301,8 +295,12 @@ void Archive::compress(const char* ifile, const char* ofile){
 	}catch(std::ifstream::failure& exc){
 		throw exception( "Errors occured while reading " + std::string(ifile) , exc.runtime_error::what(), 4);
 	}
+	try{
 	compressRaw(buffer, ofile);
-	delete[] buffer;
+	}catch(Archive::exception exc){
+		delete[] buffer;
+		throw exc;
+	}
 }
 void compressRaw(const char*message,const char*filename){
 	//open BitStream for writing
