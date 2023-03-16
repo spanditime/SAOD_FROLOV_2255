@@ -20,4 +20,5 @@ int main(){
 		cout<< c[i] << '*' <<c[i]<<'='<<c[i]*c[i]<<endl;
 		cout<<endl;
 	}
+	delete[] c;
 }
