@@ -41,6 +41,8 @@ public:
 		char *c = new char[strlen(p)+strlen(cp)+1];
 		strcpy(c,cp);
 		strcat(c,p);
-		return Str(c);
+		Str ret = Str(c);
+		delete[] c;
+		return ret;
 	}
 };
